@@ -1,14 +1,15 @@
 import os
 import time
 
-import requests
-import telegram
+import requests  # мне импорты так отсортировал isort
+import telegram  # и PEP8 я читал - вроде все удовлетворяет стандартам ¯\_(ツ)_/¯
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
 
-PRACTICUM_TOKEN = os.getenv("PRACTICUM_TOKEN")
+PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 PROXY_URL = 'https://45.224.21.82:999'
@@ -25,7 +26,7 @@ def parse_homework_status(homework):
 
 
 def get_homework_statuses(current_timestamp):
-    headers = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
+    headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {'from_date': current_timestamp}
     homework_statuses = requests.get(
         'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
@@ -33,7 +34,7 @@ def get_homework_statuses(current_timestamp):
         params=params
     )
     # эту строчку удалил из-за несовместимости с тестами
-    #homework_statuses.raise_for_status()
+    # homework_statuses.raise_for_status()
     return homework_statuses.json()
 
 
@@ -51,19 +52,20 @@ def main():
 
     while True:
         try:
-            new_homework = get_homework_statuses(current_timestamp)
-            if new_homework.get('homeworks'):
-                bot.send_message(
-                    chat_id=CHAT_ID,
-                    text=parse_homework_status(new_homework.get('homeworks')[0])
-                )
-            current_timestamp = new_homework.get('current_date')  # обновить timestamp
-            time.sleep(300)  # опрашивать раз в пять минут
+            response = get_homework_statuses(current_timestamp)
+            homeworks = response.get('homeworks', [])
+            current_timestamp = response.get('current_date', int(time.time()))
+            if homeworks:
+                bot.send_message(chat_id=CHAT_ID, text=parse_homework_status(homeworks[0]))
+            time.sleep(300)
+
+        except KeyboardInterrupt:
+            print('Все, заканчиваю')
+            break
 
         except Exception as e:
             print(f'Бот упал с ошибкой: {e}')
             time.sleep(5)
-            continue
 
 
 if __name__ == '__main__':
