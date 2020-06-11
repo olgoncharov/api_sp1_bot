@@ -2,4 +2,4 @@
 Учебный проект для **Яндекс.Практикум**.
 Telegram-бот, который проверяет статусы домашних работ в Яндекс.Практикум и делает оповещение при изменении статуса проверки работы.
 
-Бот реализован с использованием библиотеки [python-telegram-bot] (https://github.com/python-telegram-bot/python-telegram-bot)
+Бот реализован с использованием библиотеки [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)
